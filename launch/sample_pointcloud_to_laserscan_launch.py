@@ -8,23 +8,18 @@ def generate_launch_description():
     return LaunchDescription([
 
         Node(
-            package='pointcloud_to_laserscan', executable='dummy_pointcloud_publisher',
-            remappings=[('cloud', '/cloud')],
-            parameters=[{'cloud_frame_id': 'cloud', 'cloud_extent': 2.0, 'cloud_size': 500}],
-            name='cloud_publisher'
-        ),
-        Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='static_transform_publisher',
-            arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'cloud']
+            # Arguments: x y z yaw pitch roll parent_frame child_frame
+            arguments=['0', '0', '0', '0', '0', '0', 'map', 'livox_frame']
         ),
         Node(
             package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-            remappings=[('cloud_in', '/cloud'),
+            remappings=[('cloud_in', '/livox/lidar'),
                         ('scan', '/scan')],
             parameters=[{
-                'target_frame': 'cloud',
+                'target_frame': 'livox_frame',
                 'transform_tolerance': 0.01,
                 'min_height': 0.0,
                 'max_height': 1.0,
