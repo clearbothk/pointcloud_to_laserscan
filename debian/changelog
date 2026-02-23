@@ -1,0 +1,5 @@
+ros-humble-clearbot-pointcloud-to-laserscan (2.0.1-0jammy) jammy; urgency=medium
+
+  * Pointcloud to scan data for obstacle node
+
+ -- Naman More <naman.more@clearbot.org>  Mon, 23 Feb 2026 16:27:25 +0530
