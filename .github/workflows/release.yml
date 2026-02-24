@@ -13,7 +13,7 @@ jobs:
       - run: |
           sudo apt -y update
           sudo apt install -y dh-make fakeroot devscripts equivs
-          mk-build-deps -i -r debian/control
+          sudo DEBIAN_FRONTEND=noninteractive mk-build-deps -i -r debian/control -t "apt-get -y"
 
       - name: fakeroot
         run: fakeroot debian/rules binary
