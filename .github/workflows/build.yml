@@ -15,7 +15,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           sudo apt -y update
-          sudo apt install -y dh-make fakeroot
+          sudo apt install -y dh-make fakeroot devscripts equivs
+          mk-build-deps -i -r debian/control
       - name: fakeroot
         run: fakeroot debian/rules binary
       - name: Debian file
