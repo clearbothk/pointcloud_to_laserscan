@@ -1,10 +1,20 @@
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument(
+            name='cloud_topic',
+            default_value='/livox/lidar'
+        ),
 
+        DeclareLaunchArgument(
+            name='scan_topic',
+            default_value='/scan'
+        ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
@@ -14,8 +24,8 @@ def generate_launch_description():
         ),
         Node(
             package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-            remappings=[('cloud_in', '/livox/lidar'),
-                        ('scan', '/scan')],
+            remappings=[('cloud_in', [LaunchConfiguration(variable_name='cloud_topic')]),
+                        ('scan', [LaunchConfiguration(variable_name='scan_topic')])],
             parameters=[{
                 'target_frame': 'livox_frame',
                 'transform_tolerance': 0.01,
