@@ -1,0 +1,31 @@
+name: Build PR DEB file artifacts
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+
+jobs:
+  build-debian:
+    runs-on: ARM64
+    container: asia-docker.pkg.dev/clearbot-360312/clearbot-public/ros:humble
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt -y update
+          sudo apt install -y dh-make fakeroot devscripts equivs
+          sudo DEBIAN_FRONTEND=noninteractive mk-build-deps -i -r debian/control -t "apt-get -y"
+      - name: fakeroot
+        run: fakeroot debian/rules binary
+      - name: Debian file
+        id: deb-file-name
+        run: |
+          cd .. && echo DEB_FILE="$(pwd)/$(find . -name "ros-humble-clearbot-pointcloud-to-laserscan*.deb" | sed -r 's/^.{2}//')" >> "$GITHUB_OUTPUT"
+      - name: Export deb file artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: built deb file
+          path: ${{ steps.deb-file-name.outputs.DEB_FILE }}
+          if-no-files-found: error

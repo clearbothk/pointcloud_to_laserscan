@@ -7,27 +7,27 @@ from launch_ros.actions import Node
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
-            name='scanner', default_value='scanner',
-            description='Namespace for sample topics'
+            name='cloud_topic',
+            default_value='/livox/lidar'
         ),
-        Node(
-            package='pointcloud_to_laserscan', executable='dummy_pointcloud_publisher',
-            remappings=[('cloud', [LaunchConfiguration(variable_name='scanner'), '/cloud'])],
-            parameters=[{'cloud_frame_id': 'cloud', 'cloud_extent': 2.0, 'cloud_size': 500}],
-            name='cloud_publisher'
+
+        DeclareLaunchArgument(
+            name='scan_topic',
+            default_value='/scan'
         ),
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             name='static_transform_publisher',
-            arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'cloud']
+            # Arguments: x y z yaw pitch roll parent_frame child_frame
+            arguments=['0', '0', '0', '0', '0', '0', 'map', 'livox_frame']
         ),
         Node(
             package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-            remappings=[('cloud_in', [LaunchConfiguration(variable_name='scanner'), '/cloud']),
-                        ('scan', [LaunchConfiguration(variable_name='scanner'), '/scan'])],
+            remappings=[('cloud_in', [LaunchConfiguration(variable_name='cloud_topic')]),
+                        ('scan', [LaunchConfiguration(variable_name='scan_topic')])],
             parameters=[{
-                'target_frame': 'cloud',
+                'target_frame': 'livox_frame',
                 'transform_tolerance': 0.01,
                 'min_height': 0.0,
                 'max_height': 1.0,
@@ -36,7 +36,7 @@ def generate_launch_description():
                 'angle_increment': 0.0087,  # M_PI/360.0
                 'scan_time': 0.3333,
                 'range_min': 0.45,
-                'range_max': 4.0,
+                'range_max': 10.0,
                 'use_inf': True,
                 'inf_epsilon': 1.0
             }],
